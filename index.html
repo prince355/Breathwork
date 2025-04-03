@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +19,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      touch-action: manipulation;
     }
 
     .logo {
@@ -31,130 +35,198 @@
       top: 10px;
       left: 10px;
       z-index: 5;
+      display: flex;
+      gap: 10px;
     }
 
-    select {
-      background: #222;
-      color: white;
-      padding: 6px 10px;
+    .sound-toggle {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .timer-display {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 14px;
-      border: 1px solid #555;
-      border-radius: 4px;
+      opacity: 0.8;
+    }
+
+    .goal-status {
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .goal-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      color: #66ffcc;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+
+    .goal-message.show {
+      opacity: 1;
     }
 
     .breath-container {
-      position: relative;
-      width: 250px;
-      height: 250px;
-      margin-bottom: 1rem;
-    }
+  position: relative;
+  width: 250px;
+  height: 250px;
+  margin-bottom: 1rem;
+}
 
-    .center-circle {
-      width: 100%;
-      height: 100%;
-      background: #333;
-      border-radius: 50%;
-      z-index: 2;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: visible;
-    }
+.center-circle {
+  width: 100%;
+  height: 100%;
+  background: #333;
+  border-radius: 50%;
+  z-index: 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  touch-action: manipulation;
+}
 
-    .ripple {
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(0);
+  animation: ripple 1s ease-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.4; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  stroke: white;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.4s ease;
+}
+
+.icon.active {
+  opacity: 1;
+}
+
+.dots {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.2;
+  transition: opacity 0.3s ease;
+}
+
+.dot.active {
+  opacity: 1;
+}
+
+svg.progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 250px;
+  z-index: 1;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.ring {
+  fill: none;
+  stroke: white;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+  filter: drop-shadow(0 0 8px white);
+}
+
+.phases {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase {
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+
+.phase.active {
+  opacity: 1;
+}
+      .theme-toggle {
       position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      transform: scale(0);
-      animation: ripple 1s ease-out;
-      pointer-events: none;
-      z-index: 0;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #aaa;
+      cursor: pointer;
     }
 
-    @keyframes ripple {
-      0% {
-        transform: scale(0);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(2.2);
-        opacity: 0;
-      }
+    body.light {
+      background: #fff;
+      color: #111;
     }
 
-    .icon {
-      width: 36px;
-      height: 36px;
-      stroke: white;
-      stroke-width: 1.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-      opacity: 0;
-      position: absolute;
-      transition: opacity 0.4s ease;
+    body.light .center-circle {
+      background: #eee;
     }
 
-    .icon.active {
-      opacity: 1;
+    body.light .ring {
+      stroke: #222;
+      filter: drop-shadow(0 0 6px #999);
     }
 
-    .dots {
-      position: absolute;
-      bottom: 20px;
-      display: flex;
-      gap: 6px;
+    body.light .dot {
+      background: #222;
     }
 
-    .dot {
-      width: 6px;
-      height: 6px;
-      background: white;
-      border-radius: 50%;
-      opacity: 0.2;
-      transition: opacity 0.3s ease;
+    body.light .icon {
+      stroke: #111;
     }
 
-    .dot.active {
-      opacity: 1;
+    body.light .phase {
+      color: #333;
     }
 
-    svg.progress-ring {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 250px;
-      height: 250px;
-      z-index: 1;
-      transform: rotate(-90deg);
-      overflow: visible;
-    }
-
-    .ring {
-      fill: none;
-      stroke: white;
-      stroke-width: 6;
-      stroke-linecap: round;
-      transition: stroke 0.3s ease;
-      filter: drop-shadow(0 0 8px white);
-    }
-
-    .phases {
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .phase {
-      opacity: 0.4;
-      transition: opacity 0.3s;
-    }
-
-    .phase.active {
-      opacity: 1;
-    }
-  </style>
+</style>
 </head>
 <body>
   <img src="logo3.jpg" alt="Logo" class="logo" />
@@ -165,145 +237,300 @@
       <option value="relax">Relax Breath (4-7-8-4)</option>
       <option value="coherence">Coherence Breath (5-5-5-5)</option>
     </select>
+    <select id="goalSelect">
+      <option value="0">No Goal</option>
+      <option value="5">5 Cycles</option>
+      <option value="10">10 Cycles</option>
+      <option value="15">15 Cycles</option>
+    </select>
   </div>
+
+  <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 13px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px;">
+  <div>
+    <span id="sessionTimer">0:00</span> | <span id="goalStatus">Cycles: 0</span>
+  </div>
+  <div>
+    <span id="soundToggle" style="cursor:pointer; color:#aaa;">🔊 Sound: On</span> | 
+    <span id="themeToggle" style="cursor:pointer; color:#aaa;">🌓 Theme: Dark</span>
+  </div>
+</div>
+  
+</div>
+  <div class="goal-message" id="goalMessage">🎉 Goal reached! Great job.</div>
 
   <div id="circleButton">
-    <div class="breath-container">
-      <svg class="progress-ring" viewBox="0 0 100 100">
-        <circle class="ring" id="ring" cx="50" cy="50" r="48" stroke-dasharray="301.6" stroke-dashoffset="301.6" />
-      </svg>
+  <div class="breath-container">
+    <svg class="progress-ring" viewBox="0 0 100 100">
+      <circle class="ring" id="ring" cx="50" cy="50" r="48" stroke-dasharray="301.6" stroke-dashoffset="301.6" />
+    </svg>
 
-      <div class="center-circle" id="centerCircle">
-        <svg id="icon-inhale" class="icon active" viewBox="0 0 24 24">
-          <polygon points="5,3 19,12 5,21" />
-        </svg>
-        <svg id="icon-hold" class="icon" viewBox="0 0 24 24">
-          <rect x="6" y="4" width="4" height="16" />
-          <rect x="14" y="4" width="4" height="16" />
-        </svg>
-        <svg id="icon-exhale" class="icon" viewBox="0 0 24 24">
-          <polygon points="19,21 5,12 19,3" />
-        </svg>
-        <div class="dots" id="dotContainer"></div>
-      </div>
+    <div class="center-circle" id="centerCircle">
+      <svg id="icon-play" class="icon active" viewBox="0 0 24 24">
+        <polygon points="5,3 19,12 5,21" />
+      </svg>
+      <svg id="icon-pause" class="icon" viewBox="0 0 24 24">
+        <rect x="6" y="4" width="4" height="16" />
+        <rect x="14" y="4" width="4" height="16" />
+      </svg>
+      <svg id="icon-stop" class="icon" viewBox="0 0 24 24">
+        <rect x="6" y="6" width="12" height="12" />
+      </svg>
+      <div class="dots" id="dotContainer"></div>
     </div>
   </div>
+</div>
 
-  <div class="phases">
-    <div class="phase" id="label-inhale">Inhale</div>
-    <div class="phase" id="label-hold1">Hold</div>
-    <div class="phase" id="label-exhale">Exhale</div>
-    <div class="phase" id="label-hold2">Hold</div>
-  </div>
+
+
+<div class="phases">
+  <div class="phase" id="label-inhale">Inhale</div>
+  <div class="phase" id="label-hold1">Hold</div>
+  <div class="phase" id="label-exhale">Exhale</div>
+  <div class="phase" id="label-hold2">Hold</div>
+</div>
 
   <script>
-    const breathPatterns = {
-      box: [4, 4, 4, 4],
-      relax: [4, 7, 8, 4],
-      coherence: [5, 5, 5, 5]
-    };
+window.addEventListener('DOMContentLoaded', () => {
+  const ring = document.getElementById('ring');
+  const centerCircle = document.getElementById('centerCircle');
+  const dotContainer = document.getElementById('dotContainer');
+  const timerDisplay = document.getElementById('sessionTimer');
+  const playIcon = document.getElementById('icon-play');
+  const pauseIcon = document.getElementById('icon-pause');
+  const stopIcon = document.getElementById('icon-stop');
+  const goalStatus = document.getElementById('goalStatus');
+  const breathMode = document.getElementById('breathMode');
+  const goalSelect = document.getElementById('goalSelect');
+  const soundToggle = document.getElementById('soundToggle');
+  const goalMessage = document.getElementById('goalMessage');
 
-    const ring = document.getElementById('ring');
-    const centerCircle = document.getElementById('centerCircle');
-    const dotContainer = document.getElementById('dotContainer');
-    const icons = {
-      'icon-inhale': document.getElementById('icon-inhale'),
-      'icon-hold': document.getElementById('icon-hold'),
-      'icon-exhale': document.getElementById('icon-exhale')
-    };
+  const breathPatterns = {
+    box: [4, 4, 4, 4],
+    relax: [4, 7, 8, 4],
+    coherence: [5, 5, 5, 5]
+  };
 
-    const phases = ['inhale', 'hold', 'exhale', 'hold'];
-    let currentPattern = breathPatterns['box'];
-    let current = 0;
-    let timeoutId = null;
-    let rippleInterval = null;
+  const phases = ['inhale', 'hold', 'exhale', 'hold'];
+  let currentPattern = breathPatterns[breathMode.value];
+  let current = 0;
+  let timeoutId = null;
+  let rippleInterval = null;
+  let sessionInterval = null;
+  let isPaused = false;
+  let startTime = null;
+  let cycleCount = 0;
+  let goalCycles = parseInt(goalSelect.value);
+  let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') || 'true');
 
-    function resetIcons() {
-      Object.values(icons).forEach(icon => icon.classList.remove('active'));
+  function updateDots(duration, reverse = false) {
+    dotContainer.innerHTML = '';
+    const dots = [];
+    for (let i = 0; i < duration; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      dotContainer.appendChild(dot);
+      dots.push(dot);
+    }
+    const sequence = reverse ? [...dots].reverse() : dots;
+    sequence.forEach((dot, i) => {
+      setTimeout(() => dot.classList.add('active'), (duration / dots.length) * i * 1000);
+    });
+  }
+
+  function startRipples() {
+    rippleInterval = setInterval(() => {
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      ripple.style.width = '100%';
+      ripple.style.height = '100%';
+      centerCircle.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 1000);
+    }, 1000);
+  }
+
+  function stopRipples() {
+    clearInterval(rippleInterval);
+  }
+
+  function updateSessionTimer() {
+    const now = new Date();
+    const seconds = Math.floor((now - startTime) / 1000);
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  function playSound() {
+    if (!soundEnabled) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 440;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+  }
+
+  function vibrate() {
+    if (navigator.vibrate) navigator.vibrate(100);
+  }
+
+  function updatePhase() {
+    const phase = phases[current];
+    const duration = currentPattern[current];
+    const color = phase === 'inhale' ? '#66ff66' : phase === 'exhale' ? '#66ccff' : '#ffaa00';
+
+    ring.style.stroke = color;
+    ring.style.transition = `stroke-dashoffset ${duration}s linear`;
+
+    if (phase === 'inhale') {
+      ring.style.strokeDashoffset = 301.6;
+      requestAnimationFrame(() => ring.style.strokeDashoffset = 0);
+    } else if (phase === 'exhale') {
+      ring.style.strokeDashoffset = 0;
+      requestAnimationFrame(() => ring.style.strokeDashoffset = 301.6);
     }
 
-    function updateDots(duration, reverse = false) {
-      dotContainer.innerHTML = '';
-      const dots = [];
-      for (let i = 0; i < duration; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'dot';
-        dotContainer.appendChild(dot);
-        dots.push(dot);
-      }
-      const sequence = reverse ? [...dots].reverse() : dots;
-      sequence.forEach((dot, i) => {
-        setTimeout(() => {
-          dot.classList.add('active');
-        }, (duration / dots.length) * i * 1000);
-      });
-    }
-
-    function startRipples() {
-      rippleInterval = setInterval(() => {
-        const ripple = document.createElement('div');
-        ripple.className = 'ripple';
-        ripple.style.width = '100%';
-        ripple.style.height = '100%';
-        centerCircle.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 1000);
-      }, 1000);
-    }
-
-    function stopRipples() {
-      clearInterval(rippleInterval);
-    }
-
-    function updatePhase() {
-      const phase = phases[current];
-      const duration = currentPattern[current];
-      const color = phase === 'inhale' ? '#66ff66' : phase === 'exhale' ? '#66ccff' : '#ffaa00';
-
-      ring.style.stroke = color;
-      ring.style.transition = `stroke-dashoffset ${duration}s linear`;
-
-      if (phase === 'inhale') {
-        ring.style.strokeDashoffset = 301.6;
-        requestAnimationFrame(() => {
-          ring.style.strokeDashoffset = 0;
-        });
-      } else if (phase === 'exhale') {
-        ring.style.strokeDashoffset = 0;
-        requestAnimationFrame(() => {
-          ring.style.strokeDashoffset = 301.6;
-        });
-      }
-
-      resetIcons();
-      icons[`icon-${phase}`].classList.add('active');
-
-      document.querySelectorAll('.phase').forEach((el, i) => {
-        el.classList.toggle('active', i === current);
-      });
-
-      updateDots(duration, phase === 'hold');
-      stopRipples();
-      startRipples();
-
-      timeoutId = setTimeout(() => {
-        current = (current + 1) % phases.length;
-        updatePhase();
-      }, duration * 1000);
-    }
-
-    function startBreathing() {
-      clearTimeout(timeoutId);
-      stopRipples();
-      current = 0;
-      updatePhase();
-    }
-
-    document.getElementById('breathMode').addEventListener('change', e => {
-      currentPattern = breathPatterns[e.target.value];
-      startBreathing();
+    document.querySelectorAll('.phase').forEach((el, i) => {
+      el.classList.toggle('active', i === current);
     });
 
-    document.getElementById('circleButton').addEventListener('click', startBreathing);
-  </script>
+    updateDots(duration, phase === 'hold');
+    stopRipples();
+    startRipples();
+    playSound();
+    vibrate();
+
+    timeoutId = setTimeout(() => {
+      if (!isPaused) {
+        current = (current + 1) % phases.length;
+        if (current === 0) {
+          cycleCount++;
+          goalStatus.textContent = `Cycles: ${cycleCount}`;
+          if (goalCycles > 0 && cycleCount >= goalCycles) {
+            pauseBreathing();
+            goalMessage.classList.add('show');
+            setTimeout(() => goalMessage.classList.remove('show'), 5000);
+          }
+        }
+        updatePhase();
+      }
+    }, duration * 1000);
+  }
+
+  function startBreathing() {
+    clearTimeout(timeoutId);
+    stopRipples();
+    current = 0;
+    isPaused = false;
+    cycleCount = 0;
+    goalCycles = parseInt(goalSelect.value);
+    goalStatus.textContent = 'Cycles: 0';
+    startTime = new Date();
+    sessionInterval = setInterval(updateSessionTimer, 1000);
+    showIcon('pause');
+    updatePhase();
+  }
+
+  function pauseBreathing() {
+    clearTimeout(timeoutId);
+    isPaused = true;
+    stopRipples();
+    clearInterval(sessionInterval);
+    showIcon('play');
+  }
+
+  function stopBreathing() {
+    clearTimeout(timeoutId);
+    stopRipples();
+    clearInterval(sessionInterval);
+    ring.style.strokeDashoffset = 301.6;
+    dotContainer.innerHTML = '';
+    timerDisplay.textContent = '0:00';
+    goalStatus.textContent = 'Cycles: 0';
+    document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+    showIcon('play');
+  }
+
+  function showIcon(state) {
+    playIcon.classList.remove('active');
+    pauseIcon.classList.remove('active');
+    stopIcon.classList.remove('active');
+    document.getElementById(`icon-${state}`).classList.add('active');
+  }
+
+  function updateSoundUI() {
+    soundToggle.textContent = soundEnabled ? '🔊 Sound: On' : '🔇 Sound: Off';
+  }
+
+  function savePreferences() {
+    localStorage.setItem('breathMode', breathMode.value);
+    localStorage.setItem('goalSelect', goalSelect.value);
+    localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
+  }
+
+  function loadPreferences() {
+    if (localStorage.getItem('breathMode')) breathMode.value = localStorage.getItem('breathMode');
+    if (localStorage.getItem('goalSelect')) goalSelect.value = localStorage.getItem('goalSelect');
+    soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') || 'true');
+  }
+
+  breathMode.addEventListener('change', () => {
+    currentPattern = breathPatterns[breathMode.value];
+    stopBreathing();
+    savePreferences();
+  });
+
+  goalSelect.addEventListener('change', () => {
+    goalCycles = parseInt(goalSelect.value);
+    stopBreathing();
+    savePreferences();
+  });
+
+  soundToggle.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    updateSoundUI();
+    savePreferences();
+  });
+
+  let longPressTimer;
+  centerCircle.addEventListener('mousedown', () => {
+    longPressTimer = setTimeout(() => stopBreathing(), 800);
+  });
+  centerCircle.addEventListener('mouseup', () => clearTimeout(longPressTimer));
+  centerCircle.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
+  centerCircle.addEventListener('touchstart', () => {
+    longPressTimer = setTimeout(() => stopBreathing(), 800);
+  });
+  centerCircle.addEventListener('touchend', () => clearTimeout(longPressTimer));
+
+  centerCircle.addEventListener('click', () => {
+    if (pauseIcon.classList.contains('active')) {
+      pauseBreathing();
+    } else {
+      startBreathing();
+    }
+  });
+
+  loadPreferences();
+
+  const themeToggle = document.getElementById('themeToggle');
+  let isLightTheme = localStorage.getItem('theme') === 'light';
+  if (isLightTheme) document.body.classList.add('light');
+  themeToggle.textContent = isLightTheme ? '🌓 Theme: Light' : '🌓 Theme: Dark';
+
+  themeToggle.addEventListener('click', () => {
+    isLightTheme = !isLightTheme;
+    document.body.classList.toggle('light');
+    themeToggle.textContent = isLightTheme ? '🌓 Theme: Light' : '🌓 Theme: Dark';
+    localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+  });
+  currentPattern = breathPatterns[breathMode.value];
+  updateSoundUI();
+});
+</script>
 </body>
 </html>
