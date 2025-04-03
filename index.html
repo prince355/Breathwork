@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Breathwork Visualizer</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .logo {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 60px;
+      height: auto;
+    }
+
+    .mode-select {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 5;
+    }
+
+    select {
+      background: #222;
+      color: white;
+      padding: 6px 10px;
+      font-size: 14px;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+
+    .breath-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin-bottom: 1rem;
+    }
+
+    .center-circle {
+      width: 100%;
+      height: 100%;
+      background: #333;
+      border-radius: 50%;
+      z-index: 2;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      transform: scale(0);
+      animation: ripple 1s ease-out;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0);
+        opacity: 0.4;
+      }
+      100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
+    }
+
+    .icon {
+      width: 36px;
+      height: 36px;
+      stroke: white;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      opacity: 0;
+      position: absolute;
+      transition: opacity 0.4s ease;
+    }
+
+    .icon.active {
+      opacity: 1;
+    }
+
+    .dots {
+      position: absolute;
+      bottom: 20px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.2;
+      transition: opacity 0.3s ease;
+    }
+
+    .dot.active {
+      opacity: 1;
+    }
+
+    svg.progress-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 250px;
+      z-index: 1;
+      transform: rotate(-90deg);
+      overflow: visible;
+    }
+
+    .ring {
+      fill: none;
+      stroke: white;
+      stroke-width: 6;
+      stroke-linecap: round;
+      transition: stroke 0.3s ease;
+      filter: drop-shadow(0 0 8px white);
+    }
+
+    .phases {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .phase {
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+
+    .phase.active {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo3.jpg" alt="Logo" class="logo" />
+
+  <div class="mode-select">
+    <select id="breathMode">
+      <option value="box">Box Breath (4-4-4-4)</option>
+      <option value="relax">Relax Breath (4-7-8-4)</option>
+      <option value="coherence">Coherence Breath (5-5-5-5)</option>
+    </select>
+  </div>
+
+  <div id="circleButton">
+    <div class="breath-container">
+      <svg class="progress-ring" viewBox="0 0 100 100">
+        <circle class="ring" id="ring" cx="50" cy="50" r="48" stroke-dasharray="301.6" stroke-dashoffset="301.6" />
+      </svg>
+
+      <div class="center-circle" id="centerCircle">
+        <svg id="icon-inhale" class="icon active" viewBox="0 0 24 24">
+          <polygon points="5,3 19,12 5,21" />
+        </svg>
+        <svg id="icon-hold" class="icon" viewBox="0 0 24 24">
+          <rect x="6" y="4" width="4" height="16" />
+          <rect x="14" y="4" width="4" height="16" />
+        </svg>
+        <svg id="icon-exhale" class="icon" viewBox="0 0 24 24">
+          <polygon points="19,21 5,12 19,3" />
+        </svg>
+        <div class="dots" id="dotContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phases">
+    <div class="phase" id="label-inhale">Inhale</div>
+    <div class="phase" id="label-hold1">Hold</div>
+    <div class="phase" id="label-exhale">Exhale</div>
+    <div class="phase" id="label-hold2">Hold</div>
+  </div>
+
+  <script>
+    const breathPatterns = {
+      box: [4, 4, 4, 4],
+      relax: [4, 7, 8, 4],
+      coherence: [5, 5, 5, 5]
+    };
+
+    const ring = document.getElementById('ring');
+    const centerCircle = document.getElementById('centerCircle');
+    const dotContainer = document.getElementById('dotContainer');
+    const icons = {
+      'icon-inhale': document.getElementById('icon-inhale'),
+      'icon-hold': document.getElementById('icon-hold'),
+      'icon-exhale': document.getElementById('icon-exhale')
+    };
+
+    const phases = ['inhale', 'hold', 'exhale', 'hold'];
+    let currentPattern = breathPatterns['box'];
+    let current = 0;
+    let timeoutId = null;
+    let rippleInterval = null;
+
+    function resetIcons() {
+      Object.values(icons).forEach(icon => icon.classList.remove('active'));
+    }
+
+    function updateDots(duration, reverse = false) {
+      dotContainer.innerHTML = '';
+      const dots = [];
+      for (let i = 0; i < duration; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dotContainer.appendChild(dot);
+        dots.push(dot);
+      }
+      const sequence = reverse ? [...dots].reverse() : dots;
+      sequence.forEach((dot, i) => {
+        setTimeout(() => {
+          dot.classList.add('active');
+        }, (duration / dots.length) * i * 1000);
+      });
+    }
+
+    function startRipples() {
+      rippleInterval = setInterval(() => {
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple';
+        ripple.style.width = '100%';
+        ripple.style.height = '100%';
+        centerCircle.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 1000);
+      }, 1000);
+    }
+
+    function stopRipples() {
+      clearInterval(rippleInterval);
+    }
+
+    function updatePhase() {
+      const phase = phases[current];
+      const duration = currentPattern[current];
+      const color = phase === 'inhale' ? '#66ff66' : phase === 'exhale' ? '#66ccff' : '#ffaa00';
+
+      ring.style.stroke = color;
+      ring.style.transition = `stroke-dashoffset ${duration}s linear`;
+
+      if (phase === 'inhale') {
+        ring.style.strokeDashoffset = 301.6;
+        requestAnimationFrame(() => {
+          ring.style.strokeDashoffset = 0;
+        });
+      } else if (phase === 'exhale') {
+        ring.style.strokeDashoffset = 0;
+        requestAnimationFrame(() => {
+          ring.style.strokeDashoffset = 301.6;
+        });
+      }
+
+      resetIcons();
+      icons[`icon-${phase}`].classList.add('active');
+
+      document.querySelectorAll('.phase').forEach((el, i) => {
+        el.classList.toggle('active', i === current);
+      });
+
+      updateDots(duration, phase === 'hold');
+      stopRipples();
+      startRipples();
+
+      timeoutId = setTimeout(() => {
+        current = (current + 1) % phases.length;
+        updatePhase();
+      }, duration * 1000);
+    }
+
+    function startBreathing() {
+      clearTimeout(timeoutId);
+      stopRipples();
+      current = 0;
+      updatePhase();
+    }
+
+    document.getElementById('breathMode').addEventListener('change', e => {
+      currentPattern = breathPatterns[e.target.value];
+      startBreathing();
+    });
+
+    document.getElementById('circleButton').addEventListener('click', startBreathing);
+  </script>
+</body>
+</html>
